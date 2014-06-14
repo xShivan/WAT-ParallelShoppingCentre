@@ -34,6 +34,8 @@ namespace ParallelMall
             {
                 if (cases[0].GetProductCount(0) == 0)
                 {
+                    cases[0].RefillingPreparation = true;
+                    while (cases[0].Taking) Thread.Sleep(1); //Oczekiwanie aż klienci odpuszczą
                     cases[0].RefillProducts(0);
                 }
                 else Thread.Sleep(1000);
@@ -61,6 +63,7 @@ namespace ParallelMall
                 if (clientQueue.Count != 0)
                 {
                     Thread.Sleep(1000);
+                    while (cases[0].RefillingPreparation || cases[0].Refilling) Thread.Sleep(1); //Łapy precz - pan chce nałożyć produkty
                     cases[0].TakeProduct(0);
                     clientQueue.RemoveAt(0);
                 }

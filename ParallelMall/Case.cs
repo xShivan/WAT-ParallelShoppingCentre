@@ -22,6 +22,8 @@ namespace ParallelMall
 		private int productTypesCount;
 		private List<int> counts;
         public bool Refilling { get; private set; }
+        public bool RefillingPreparation { get; set; }
+        public bool Taking { get; private set; }
 
         public int GetProductCount(int productType)
         {
@@ -69,9 +71,11 @@ namespace ParallelMall
 		public void RefillProducts(int ProductType)
 		{
             Refilling = true;
+            RefillingPreparation = false;
             while (counts[ProductType] < 30)
             {
                 counts[ProductType]++;
+                updateControl();
                 System.Threading.Thread.Sleep(250);
             }
             Refilling = false;
@@ -79,8 +83,10 @@ namespace ParallelMall
 		
 		public void TakeProduct(int productType)
 		{
+            Taking = true;
 			counts[productType]--;
 			updateControl();
+            Taking = false;
 		}
 	}
 }
