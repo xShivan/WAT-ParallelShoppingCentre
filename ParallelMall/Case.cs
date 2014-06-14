@@ -21,6 +21,12 @@ namespace ParallelMall
 	{
 		private int productTypesCount;
 		private List<int> counts;
+        public bool Refilling { get; private set; }
+
+        public int GetProductCount(int productType)
+        {
+            return counts[productType];
+        }
 		
 		
 		public Case(int caseId, int productTypesCount, int initialNumberOfProducts)
@@ -40,19 +46,35 @@ namespace ParallelMall
 			}
 			updateControl();
 		}
-		
+
+        delegate void updateControlDelegate();
 		private void updateControl()
 		{
-			lblState.Text = String.Empty;
-			for (int i = 0; i < productTypesCount; i++)
-			{
-				lblState.Text = lblState.Text + "Product " + i + ": " + counts[i].ToString() + "\n";
-			}
+            if (this.lblState.InvokeRequired)
+            {
+                updateControlDelegate d = new updateControlDelegate(updateControl);
+                this.Invoke(d);
+            }
+            else
+            {
+                lblState.Text = String.Empty;
+                for (int i = 0; i < productTypesCount; i++)
+                {
+                    lblState.Text = lblState.Text + "Product " + i + ": " + counts[i].ToString() + "\n";
+                }
+            }
 		}
+
 		
-		public void RefillProducts()
+		public void RefillProducts(int ProductType)
 		{
-			
+            Refilling = true;
+            while (counts[ProductType] < 30)
+            {
+                counts[ProductType]++;
+                System.Threading.Thread.Sleep(250);
+            }
+            Refilling = false;
 		}
 		
 		public void TakeProduct(int productType)

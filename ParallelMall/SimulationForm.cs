@@ -23,18 +23,50 @@ namespace ParallelMall
 		private int numberProductTypes;
 		private int numberOfProducts;
 		private Thread clientsGeneration;
+        private Thread productsConsumption;
+        private Thread casesWatching;
 		private List<Case> cases;
-		
+        private List<int> clientQueue;
+
+        private void watchCases()
+        {
+            while(true)
+            {
+                if (cases[0].GetProductCount(0) == 0)
+                {
+                    cases[0].RefillProducts(0);
+                }
+                else Thread.Sleep(1000);
+            }
+        }
+
 		private void generateClients()
 		{
+            clientQueue = new List<int>();
 			Random rand = new Random();
 			while (true)
 			{
-				int time = rand.Next(250, 1000); //Czas oczekiwania
+				int time = rand.Next(500, 1300); //Czas oczekiwania na dołączenie kolejnego klienta
 				Thread.Sleep(time);
-				int queue = rand.Next(1, numberCases); //Kolejka do dołączenia się
+				int queue = rand.Next(0, numberCases - 1); //Numer kolejki do dołączenia się
+                clientQueue.Add(1);
+                lblClientsIndicator.Text = "Clients: " + clientQueue.Count;
 			}
 		}
+
+        private void consumeProducts()
+        {
+            while (true)
+            {
+                if (clientQueue.Count != 0)
+                {
+                    Thread.Sleep(1000);
+                    cases[0].TakeProduct(0);
+                    clientQueue.RemoveAt(0);
+                }
+                else Thread.Sleep(1);
+            }
+        }
 		
 		private void initializeVisualisation()
 		{
@@ -50,8 +82,15 @@ namespace ParallelMall
 					this.Size = new Size((i + 1) * 155, 200);
 				}
 			}
+
+            casesWatching = new Thread(new ThreadStart(watchCases));
+            casesWatching.Start();
+
 			clientsGeneration = new Thread(new ThreadStart(generateClients));
 			clientsGeneration.Start();
+
+            productsConsumption = new Thread(new ThreadStart(consumeProducts));
+            productsConsumption.Start();
 		}
 		
 		public SimulationForm(int casesCount, int typesCount, int productCount)
