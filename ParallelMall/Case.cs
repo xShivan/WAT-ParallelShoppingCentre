@@ -69,19 +69,18 @@ namespace ParallelMall
             }
 		}
 
-		
-		public void RefillProducts(int ProductType)
-		{
+        public void RefillProducts(int ProductType)
+        {
             Refilling = true;
             RefillingPreparation = false;
             while (counts[ProductType] < productQuantity)
             {
                 counts[ProductType]++;
                 updateControl();
-                System.Threading.Thread.Sleep(250);
+                System.Threading.Thread.Sleep(500);
             }
             Refilling = false;
-		}
+        }
 		
 		public void TakeProduct(int productType)
 		{

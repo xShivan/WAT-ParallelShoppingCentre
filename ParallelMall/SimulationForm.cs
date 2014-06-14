@@ -26,17 +26,32 @@ namespace ParallelMall
         private Thread productsConsumption;
         private Thread casesWatching;
 		private List<Case> cases;
-        private List<int> clientQueue;
+        private List<Client> clientQueue;
+
+        //Zwraca listę typów produktów, których już nie ma na półce
+        private List<int> checkIfCaseIsEmpty(Case c)
+        {
+            List<int> productTypes = new List<int>();
+            for (int i = 0; i < numberProductTypes; i++)
+            {
+                if (c.GetProductCount(i) <= 0) productTypes.Add(i);
+            }
+            return productTypes;
+        }
 
         private void watchCases()
         {
             while(true)
             {
-                if (cases[0].GetProductCount(0) == 0)
+                List<int> emptyCases = checkIfCaseIsEmpty(cases[0]);
+                if (emptyCases.Count != 0)
                 {
                     cases[0].RefillingPreparation = true;
                     while (cases[0].Taking) Thread.Sleep(1); //Oczekiwanie aż klienci odpuszczą
-                    cases[0].RefillProducts(0);
+                    foreach (int i in emptyCases)
+                    {
+                        cases[0].RefillProducts(i);
+                    }
                 }
                 else Thread.Sleep(1000);
             }
@@ -44,14 +59,16 @@ namespace ParallelMall
 
 		private void generateClients()
 		{
-            clientQueue = new List<int>();
+            
 			Random rand = new Random();
 			while (true)
 			{
 				int time = rand.Next(500, 1300); //Czas oczekiwania na dołączenie kolejnego klienta
 				Thread.Sleep(time);
 				int queue = rand.Next(0, numberCases - 1); //Numer kolejki do dołączenia się
-                clientQueue.Add(1);
+                int productType = rand.Next(0, numberProductTypes);
+                Client c = new Client(productType);
+                clientQueue.Add(c);
                 lblClientsIndicator.Text = "Clients: " + clientQueue.Count;
 			}
 		}
@@ -64,7 +81,9 @@ namespace ParallelMall
                 {
                     Thread.Sleep(500);
                     while (cases[0].RefillingPreparation || cases[0].Refilling) Thread.Sleep(1); //Łapy precz - pan chce nałożyć produkty
-                    cases[0].TakeProduct(0);
+                    Client currentClient = clientQueue[0];
+                    while (cases[0].GetProductCount(currentClient.ProductType) <= 0) Thread.Sleep(1);
+                    cases[0].TakeProduct(currentClient.ProductType);
                     clientQueue.RemoveAt(0);
                     lblClientsIndicator.Text = "Clients: " + clientQueue.Count;
                 }
@@ -86,16 +105,20 @@ namespace ParallelMall
 					this.Size = new Size((i + 1) * 155, 200);
 				}
 			}
+		}
 
+        public void initializeSimulation()
+        {
+            clientQueue = new List<Client>();
             casesWatching = new Thread(new ThreadStart(watchCases));
             casesWatching.Start();
 
-			clientsGeneration = new Thread(new ThreadStart(generateClients));
-			clientsGeneration.Start();
+            clientsGeneration = new Thread(new ThreadStart(generateClients));
+            clientsGeneration.Start();
 
             productsConsumption = new Thread(new ThreadStart(consumeProducts));
             productsConsumption.Start();
-		}
+        }
 		
 		public SimulationForm(int casesCount, int typesCount, int productCount)
 		{
@@ -109,6 +132,7 @@ namespace ParallelMall
 			this.numberOfProducts = productCount;
 			
 			initializeVisualisation();
+            initializeSimulation();
 		}
 	}
 }
