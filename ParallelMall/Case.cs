@@ -20,6 +20,7 @@ namespace ParallelMall
 	public partial class Case : UserControl
 	{
 		private int productTypesCount;
+        private int productQuantity;
 		private List<int> counts;
         public bool Refilling { get; private set; }
         public bool RefillingPreparation { get; set; }
@@ -37,6 +38,7 @@ namespace ParallelMall
 			// The InitializeComponent() call is required for Windows Forms designer support.
 			//
 			InitializeComponent();
+            productQuantity = initialNumberOfProducts;
 			gBoxCase.Text = "Case " + caseId.ToString();
 			this.Tag = caseId;
 			this.productTypesCount = productTypesCount;
@@ -72,7 +74,7 @@ namespace ParallelMall
 		{
             Refilling = true;
             RefillingPreparation = false;
-            while (counts[ProductType] < 30)
+            while (counts[ProductType] < productQuantity)
             {
                 counts[ProductType]++;
                 updateControl();

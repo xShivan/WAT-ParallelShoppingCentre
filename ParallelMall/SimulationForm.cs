@@ -62,10 +62,11 @@ namespace ParallelMall
             {
                 if (clientQueue.Count != 0)
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
                     while (cases[0].RefillingPreparation || cases[0].Refilling) Thread.Sleep(1); //Łapy precz - pan chce nałożyć produkty
                     cases[0].TakeProduct(0);
                     clientQueue.RemoveAt(0);
+                    lblClientsIndicator.Text = "Clients: " + clientQueue.Count;
                 }
                 else Thread.Sleep(1);
             }
