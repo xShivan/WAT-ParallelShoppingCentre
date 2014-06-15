@@ -86,6 +86,11 @@ namespace ParallelMall
             // nudCases
             // 
             this.nudCases.Location = new System.Drawing.Point(141, 31);
+            this.nudCases.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.nudCases.Name = "nudCases";
             this.nudCases.Size = new System.Drawing.Size(120, 20);
             this.nudCases.TabIndex = 8;
@@ -98,6 +103,11 @@ namespace ParallelMall
             // nudProducts
             // 
             this.nudProducts.Location = new System.Drawing.Point(141, 57);
+            this.nudProducts.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.nudProducts.Name = "nudProducts";
             this.nudProducts.Size = new System.Drawing.Size(120, 20);
             this.nudProducts.TabIndex = 9;
@@ -110,6 +120,11 @@ namespace ParallelMall
             // nudProductCount
             // 
             this.nudProductCount.Location = new System.Drawing.Point(141, 83);
+            this.nudProductCount.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.nudProductCount.Name = "nudProductCount";
             this.nudProductCount.Size = new System.Drawing.Size(120, 20);
             this.nudProductCount.TabIndex = 11;

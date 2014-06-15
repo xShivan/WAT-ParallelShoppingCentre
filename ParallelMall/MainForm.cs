@@ -24,6 +24,7 @@ namespace ParallelMall
 			// The InitializeComponent() call is required for Windows Forms designer support.
 			//
 			InitializeComponent();
+            nudProducts.Maximum = Global.MaximumProducts;
 		}
 		
 		void BtnStartClick(object sender, EventArgs e)
