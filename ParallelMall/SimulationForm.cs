@@ -28,6 +28,7 @@ namespace ParallelMall
         private List<RichTextBox> queueLabels;
         private List<List<Client>> queues; //Indeksy odpowiadają indeksom półek
         private List<Thread> productsConsumption;
+        private bool allowNonDetermined;
 
         //Zwraca listę typów produktów, których już nie ma na półce
         private List<int> checkIfCaseIsEmpty(Case c)
@@ -60,6 +61,30 @@ namespace ParallelMall
                 }
             }
         }
+
+        private void checkDetermination()
+        {
+            if (allowNonDetermined)
+            {
+                foreach (List<Client> queue in queues)
+                {
+                    for (int i = queue.Count - 1; i >= 0; i--)
+                    {
+                        if (!queue[i].Determined)
+                        {
+                            int diff = (int)(DateTime.Now - queue[i].DateCreated).TotalSeconds;
+                            if (diff > Global.waitTime)
+                            {
+                                queue.RemoveAt(i);
+                                updateLabel(queues.IndexOf(queue));
+                                Console.WriteLine("Rezygnacja");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
 
         private delegate void updateLabelDelegate(int queue);
         private void updateLabel(int queue)
@@ -107,6 +132,8 @@ namespace ParallelMall
                 Client c = new Client(productType);
                 queues[queue].Add(c);
                 updateLabel(queue);
+                
+                checkDetermination();
                 
 			}
 		}
@@ -185,7 +212,7 @@ namespace ParallelMall
             casesWatching.Abort();
         }
 		
-		public SimulationForm(int casesCount, int typesCount, int productCount)
+		public SimulationForm(int casesCount, int typesCount, int productCount, bool allowNonDetermined)
 		{
 			//
 			// The InitializeComponent() call is required for Windows Forms designer support.
@@ -195,6 +222,7 @@ namespace ParallelMall
 			this.numberCases = casesCount;
 			this.numberProductTypes = typesCount;
 			this.numberOfProducts = productCount;
+            this.allowNonDetermined = allowNonDetermined;
 			
 			initializeVisualisation();
             initializeSimulation();

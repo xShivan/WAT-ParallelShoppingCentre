@@ -29,7 +29,7 @@ namespace ParallelMall
 		
 		void BtnStartClick(object sender, EventArgs e)
 		{
-			SimulationForm sf = new SimulationForm((int)nudCases.Value, (int)nudProducts.Value, (int)nudProductCount.Value);
+			SimulationForm sf = new SimulationForm((int)nudCases.Value, (int)nudProducts.Value, (int)nudProductCount.Value, cBoxAllowNonDetermined.Checked);
 			sf.ShowDialog();
 		}
 	}

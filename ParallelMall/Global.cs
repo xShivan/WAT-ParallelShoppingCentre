@@ -34,5 +34,6 @@ namespace ParallelMall
         }
 
         public const int MaximumProducts = 8;
+        public static int waitTime = 5; //Sekundy
     }
 }
