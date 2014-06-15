@@ -37,13 +37,13 @@ namespace ParallelMall
 		private void InitializeComponent()
 		{
             this.gBoxCase = new System.Windows.Forms.GroupBox();
-            this.lblState = new System.Windows.Forms.Label();
+            this.txtBoxState = new System.Windows.Forms.RichTextBox();
             this.gBoxCase.SuspendLayout();
             this.SuspendLayout();
             // 
             // gBoxCase
             // 
-            this.gBoxCase.Controls.Add(this.lblState);
+            this.gBoxCase.Controls.Add(this.txtBoxState);
             this.gBoxCase.Location = new System.Drawing.Point(3, 3);
             this.gBoxCase.Name = "gBoxCase";
             this.gBoxCase.Size = new System.Drawing.Size(144, 166);
@@ -51,13 +51,15 @@ namespace ParallelMall
             this.gBoxCase.TabStop = false;
             this.gBoxCase.Text = "Case";
             // 
-            // lblState
+            // txtBoxState
             // 
-            this.lblState.Location = new System.Drawing.Point(7, 20);
-            this.lblState.Name = "lblState";
-            this.lblState.Size = new System.Drawing.Size(99, 62);
-            this.lblState.TabIndex = 1;
-            this.lblState.Text = "STATE";
+            this.txtBoxState.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtBoxState.Location = new System.Drawing.Point(3, 16);
+            this.txtBoxState.Name = "txtBoxState";
+            this.txtBoxState.ReadOnly = true;
+            this.txtBoxState.Size = new System.Drawing.Size(138, 147);
+            this.txtBoxState.TabIndex = 0;
+            this.txtBoxState.Text = "";
             // 
             // Case
             // 
@@ -70,7 +72,7 @@ namespace ParallelMall
             this.ResumeLayout(false);
 
         }
-		private System.Windows.Forms.Label lblState;
         private System.Windows.Forms.GroupBox gBoxCase;
+        private System.Windows.Forms.RichTextBox txtBoxState;
 	}
 }

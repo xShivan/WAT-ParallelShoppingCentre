@@ -54,17 +54,21 @@ namespace ParallelMall
         delegate void updateControlDelegate();
 		private void updateControl()
 		{
-            if (this.lblState.InvokeRequired)
+            if (this.txtBoxState.InvokeRequired)
             {
                 updateControlDelegate d = new updateControlDelegate(updateControl);
                 this.Invoke(d);
             }
             else
             {
-                lblState.Text = String.Empty;
+                txtBoxState.Text = String.Empty;
                 for (int i = 0; i < productTypesCount; i++)
                 {
-                    lblState.Text = lblState.Text + "Product " + i + ": " + counts[i].ToString() + "\n";
+                    string appendix = "Product " + i + ": " + counts[i].ToString() + "\n";
+                    txtBoxState.AppendText(appendix);
+                    txtBoxState.Select(txtBoxState.Text.Length - appendix.Length, txtBoxState.Text.Length);
+                    txtBoxState.SelectionColor = Global.GetColor(i);
+                    txtBoxState.DeselectAll();
                 }
             }
 		}
