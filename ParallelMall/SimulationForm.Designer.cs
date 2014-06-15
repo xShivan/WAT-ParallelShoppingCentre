@@ -54,7 +54,7 @@ namespace ParallelMall
             // lblClientsIndicator
             // 
             this.lblClientsIndicator.Name = "lblClientsIndicator";
-            this.lblClientsIndicator.Size = new System.Drawing.Size(83, 17);
+            this.lblClientsIndicator.Size = new System.Drawing.Size(93, 17);
             this.lblClientsIndicator.Text = "Clients indicator";
             // 
             // SimulationForm
@@ -65,6 +65,7 @@ namespace ParallelMall
             this.Controls.Add(this.statusStrip1);
             this.Name = "SimulationForm";
             this.Text = "Simulation";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SimulationForm_FormClosing);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);

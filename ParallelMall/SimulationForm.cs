@@ -111,7 +111,7 @@ namespace ParallelMall
 			}
 		}
 
-        public void initializeSimulation()
+        private void initializeSimulation()
         {
             queues = new List<List<Client>>();
             for (int i = 0; i < numberCases; i++)
@@ -134,6 +134,13 @@ namespace ParallelMall
                 productsConsumption.Add(t);
             }
         }
+
+        private void terminateSimulation()
+        {
+            foreach (Thread t in productsConsumption) t.Abort();
+            clientsGeneration.Abort();
+            casesWatching.Abort();
+        }
 		
 		public SimulationForm(int casesCount, int typesCount, int productCount)
 		{
@@ -149,5 +156,10 @@ namespace ParallelMall
 			initializeVisualisation();
             initializeSimulation();
 		}
+
+        private void SimulationForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            terminateSimulation();
+        }
 	}
 }
