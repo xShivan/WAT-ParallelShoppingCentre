@@ -77,7 +77,7 @@ namespace ParallelMall
                             {
                                 queue.RemoveAt(i);
                                 updateLabel(queues.IndexOf(queue));
-                                Console.WriteLine("Rezygnacja");
+                                System.Diagnostics.Debug.WriteLine("Client " + (i + 1).ToString() + " in queue " + (queues.IndexOf(queue) + 1).ToString() + " leaves the queue");
                             }
                         }
                     }
@@ -177,8 +177,8 @@ namespace ParallelMall
                 l.Location = new Point(2 + i * 150, 180);
                 this.Controls.Add(l);
                 queueLabels.Add(l);
-
 			}
+            
 		}
 
         private void initializeSimulation()
