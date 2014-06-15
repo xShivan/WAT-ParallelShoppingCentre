@@ -25,7 +25,7 @@ namespace ParallelMall
 		private Thread clientsGeneration;
         private Thread casesWatching;
 		private List<Case> cases;
-        private List<Label> queueLabels;
+        private List<RichTextBox> queueLabels;
         private List<List<Client>> queues; //Indeksy odpowiadają indeksom półek
         private List<Thread> productsConsumption;
 
@@ -72,7 +72,25 @@ namespace ParallelMall
             else
             {
                 queueLabels[queue].Text = String.Empty;
-                foreach (Client cli in queues[queue]) queueLabels[queue].Text = queueLabels[queue].Text + " " + cli.ProductType;
+                queueLabels[queue].ReadOnly = true;
+                foreach (Client cli in queues[queue])
+                {
+                    queueLabels[queue].Text = queueLabels[queue].Text + " " + cli.ProductType;
+                }
+                for (int i = 0; i < queueLabels[queue].Text.Length; i++)
+                {
+                    queueLabels[queue].Select(i, i + 1);
+                    try
+                    { 
+                        string raw = queueLabels[queue].Text.Substring(i, 1);
+                        queueLabels[queue].SelectionColor = Global.GetColor(Convert.ToInt32(raw));
+                    }
+                    catch (Exception ex)
+                    {
+                        //TODO: Logger
+                    }
+                    queueLabels[queue].DeselectAll();
+                }
             }
         }
 
@@ -116,7 +134,7 @@ namespace ParallelMall
 		private void initializeVisualisation()
 		{
 			cases = new List<Case>();
-            queueLabels = new List<Label>();
+            queueLabels = new List<RichTextBox>();
 			for (int i = 0; i < numberCases; i++)
 			{
 				Case c = new Case(i + 1, numberProductTypes, numberOfProducts);
@@ -125,10 +143,11 @@ namespace ParallelMall
 				cases.Add(c);
 				if (i == numberCases - 1)
 				{
-					this.Size = new Size((i + 1) * 155, 500);
+					this.Size = new Size((i + 1) * 155, 300);
 				}
-                Label l = new Label();
-                l.Location = new Point(i * 150, 175);
+                RichTextBox l = new RichTextBox();
+                l.Size = new Size(144, 90);
+                l.Location = new Point(2 + i * 150, 180);
                 this.Controls.Add(l);
                 queueLabels.Add(l);
 
