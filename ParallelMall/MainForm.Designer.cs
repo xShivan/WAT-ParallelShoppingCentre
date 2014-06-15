@@ -44,6 +44,7 @@ namespace ParallelMall
             this.nudProducts = new System.Windows.Forms.NumericUpDown();
             this.nudProductCount = new System.Windows.Forms.NumericUpDown();
             this.lblProductCount = new System.Windows.Forms.Label();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.nudCases)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudProducts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudProductCount)).BeginInit();
@@ -142,11 +143,22 @@ namespace ParallelMall
             this.lblProductCount.TabIndex = 10;
             this.lblProductCount.Text = "Product quantity:";
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(15, 112);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(160, 17);
+            this.checkBox1.TabIndex = 12;
+            this.checkBox1.Text = "Allow non-determined clients";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(373, 164);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.nudProductCount);
             this.Controls.Add(this.lblProductCount);
             this.Controls.Add(this.nudProducts);
@@ -163,6 +175,7 @@ namespace ParallelMall
             ((System.ComponentModel.ISupportInitialize)(this.nudProducts)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudProductCount)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
 		}
 		private System.Windows.Forms.Label lblProductCount;
@@ -173,5 +186,6 @@ namespace ParallelMall
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox checkBox1;
 	}
 }
