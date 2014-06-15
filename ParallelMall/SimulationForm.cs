@@ -1,12 +1,4 @@
-﻿/*
- * Utworzone przez SharpDevelop.
- * Użytkownik: michal
- * Data: 2014-06-14
- * Godzina: 13:33
- * 
- * Do zmiany tego szablonu użyj Narzędzia | Opcje | Kodowanie | Edycja Nagłówków Standardowych.
- */
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -14,9 +6,6 @@ using System.Threading;
 
 namespace ParallelMall
 {
-	/// <summary>
-	/// Description of SimulationForm.
-	/// </summary>
 	public partial class SimulationForm : Form
 	{
 		private int numberCases;
@@ -25,10 +14,12 @@ namespace ParallelMall
 		private Thread clientsGeneration;
         private Thread casesWatching;
 		private List<Case> cases;
-        private List<RichTextBox> queueLabels;
-        private List<List<Client>> queues; //Indeksy odpowiadają indeksom półek
+        private List<RichTextBox> queueTextBoxes;
+        private List<List<Client>> queues; //Indeksy odpowiadają indeksom półek, do każdej półki lista klientów
         private List<Thread> productsConsumption;
         private bool allowNonDetermined;
+
+        #region sprzedawca
 
         //Zwraca listę typów produktów, których już nie ma na półce
         private List<int> checkIfCaseIsEmpty(Case c)
@@ -41,6 +32,7 @@ namespace ParallelMall
             return productTypes;
         }
 
+        //Obsługa działań sprzedawcy i uzupełniania produktów
         private void watchCases()
         {
             while(true)
@@ -62,6 +54,11 @@ namespace ParallelMall
             }
         }
 
+        #endregion
+
+        #region klienci
+
+        //Wyrzucanie klientów niezdeterminowanych
         private void checkDetermination()
         {
             if (allowNonDetermined)
@@ -84,41 +81,8 @@ namespace ParallelMall
                 }
             }
         }
-        
 
-        private delegate void updateLabelDelegate(int queue);
-        private void updateLabel(int queue)
-        {
-            if (queueLabels[queue].InvokeRequired)
-            {
-                updateLabelDelegate d = new updateLabelDelegate(updateLabel);
-                this.Invoke(d, new object[] { queue });
-            }
-            else
-            {
-                queueLabels[queue].Text = String.Empty;
-                queueLabels[queue].ReadOnly = true;
-                foreach (Client cli in queues[queue])
-                {
-                    queueLabels[queue].Text = queueLabels[queue].Text + " " + cli.ProductType;
-                }
-                for (int i = 0; i < queueLabels[queue].Text.Length; i++)
-                {
-                    queueLabels[queue].Select(i, i + 1);
-                    try
-                    { 
-                        string raw = queueLabels[queue].Text.Substring(i, 1);
-                        queueLabels[queue].SelectionColor = Global.GetColor(Convert.ToInt32(raw));
-                    }
-                    catch (Exception ex)
-                    {
-                        //TODO: Logger
-                    }
-                    queueLabels[queue].DeselectAll();
-                }
-            }
-        }
-
+        //Generowanie klientów
 		private void generateClients()
 		{
             
@@ -138,6 +102,7 @@ namespace ParallelMall
 			}
 		}
 
+        //Obsługa zbierania produktów z półki przez klientów
         private void consumeProducts(object queueObject)
         {
             int queue = (int)queueObject;
@@ -152,16 +117,53 @@ namespace ParallelMall
                     cases[queue].TakeProduct(currentClient.ProductType);
                     queues[queue].RemoveAt(0);
                     updateLabel(queue);
-                    //lblClientsIndicator.Text = "Clients: " + clientQueue.Count;
                 }
                 else Thread.Sleep(1);
             }
         }
-		
-		private void initializeVisualisation()
+
+        #endregion
+
+        //Aktualizacja wyświetlania kolejek
+        private delegate void updateLabelDelegate(int queue);
+        private void updateLabel(int queue)
+        {
+            if (queueTextBoxes[queue].InvokeRequired)
+            {
+                updateLabelDelegate d = new updateLabelDelegate(updateLabel);
+                this.Invoke(d, new object[] { queue });
+            }
+            else
+            {
+                queueTextBoxes[queue].Text = String.Empty;
+                queueTextBoxes[queue].ReadOnly = true;
+                foreach (Client cli in queues[queue])
+                {
+                    queueTextBoxes[queue].Text = queueTextBoxes[queue].Text + " " + cli.ProductType;
+                }
+                for (int i = 0; i < queueTextBoxes[queue].Text.Length; i++)
+                {
+                    queueTextBoxes[queue].Select(i, i + 1);
+                    try
+                    {
+                        string raw = queueTextBoxes[queue].Text.Substring(i, 1);
+                        queueTextBoxes[queue].SelectionColor = Global.GetColor(Convert.ToInt32(raw));
+                    }
+                    catch (Exception ex)
+                    {
+                        //TODO: Logger
+                    }
+                    queueTextBoxes[queue].DeselectAll();
+                }
+            }
+        }
+
+        #region systemowe
+
+        private void initializeVisualisation()
 		{
 			cases = new List<Case>();
-            queueLabels = new List<RichTextBox>();
+            queueTextBoxes = new List<RichTextBox>();
 			for (int i = 0; i < numberCases; i++)
 			{
 				Case c = new Case(i + 1, numberProductTypes, numberOfProducts);
@@ -172,11 +174,11 @@ namespace ParallelMall
 				{
 					this.Size = new Size((i + 1) * 155, 300);
 				}
-                RichTextBox l = new RichTextBox();
-                l.Size = new Size(144, 90);
-                l.Location = new Point(2 + i * 150, 180);
-                this.Controls.Add(l);
-                queueLabels.Add(l);
+                RichTextBox rtb = new RichTextBox();
+                rtb.Size = new Size(144, 90);
+                rtb.Location = new Point(2 + i * 150, 180);
+                this.Controls.Add(rtb);
+                queueTextBoxes.Add(rtb);
 			}
             
 		}
@@ -214,9 +216,6 @@ namespace ParallelMall
 		
 		public SimulationForm(int casesCount, int typesCount, int productCount, bool allowNonDetermined)
 		{
-			//
-			// The InitializeComponent() call is required for Windows Forms designer support.
-			//
 			InitializeComponent();
 			
 			this.numberCases = casesCount;
@@ -232,5 +231,7 @@ namespace ParallelMall
         {
             terminateSimulation();
         }
-	}
+
+        #endregion
+    }
 }

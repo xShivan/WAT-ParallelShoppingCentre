@@ -1,12 +1,4 @@
-﻿/*
- * Created by SharpDevelop.
- * User: michal
- * Date: 2014-06-14
- * Time: 13:44
- * 
- * To change this template use Tools | Options | Coding | Edit Standard Headers.
- */
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -14,9 +6,6 @@ using System.Windows.Forms;
 
 namespace ParallelMall
 {
-	/// <summary>
-	/// Description of Case.
-	/// </summary>
 	public partial class Case : UserControl
 	{
 		private int productTypesCount;
@@ -34,9 +23,6 @@ namespace ParallelMall
 		
 		public Case(int caseId, int productTypesCount, int initialNumberOfProducts)
 		{
-			//
-			// The InitializeComponent() call is required for Windows Forms designer support.
-			//
 			InitializeComponent();
             productQuantity = initialNumberOfProducts;
 			gBoxCase.Text = "Case " + caseId.ToString();
