@@ -25,6 +25,7 @@ namespace ParallelMall
 		private Thread clientsGeneration;
         private Thread casesWatching;
 		private List<Case> cases;
+        private List<Label> queueLabels;
         private List<List<Client>> queues; //Indeksy odpowiadają indeksom półek
         private List<Thread> productsConsumption;
 
@@ -60,19 +61,35 @@ namespace ParallelMall
             }
         }
 
+        private delegate void updateLabelDelegate(int queue);
+        private void updateLabel(int queue)
+        {
+            if (queueLabels[queue].InvokeRequired)
+            {
+                updateLabelDelegate d = new updateLabelDelegate(updateLabel);
+                this.Invoke(d, new object[] { queue });
+            }
+            else
+            {
+                queueLabels[queue].Text = String.Empty;
+                foreach (Client cli in queues[queue]) queueLabels[queue].Text = queueLabels[queue].Text + " " + cli.ProductType;
+            }
+        }
+
 		private void generateClients()
 		{
             
 			Random rand = new Random();
 			while (true)
 			{
-				int time = rand.Next(500 / numberCases * 3, 1300 / numberCases * 3); //Czas oczekiwania na dołączenie kolejnego klienta
+				int time = rand.Next(500 / numberCases, 1300 / numberCases); //Czas oczekiwania na dołączenie kolejnego klienta
 				Thread.Sleep(time);
 				int queue = rand.Next(0, numberCases); //Numer kolejki do dołączenia się
                 int productType = rand.Next(0, numberProductTypes);
                 Client c = new Client(productType);
                 queues[queue].Add(c);
-                lblClientsIndicator.Text = "Clients: " + queues[0].Count.ToString() + " " + queues[1].Count.ToString() + "" +queues[2].Count.ToString();
+                updateLabel(queue);
+                
 			}
 		}
 
@@ -83,12 +100,13 @@ namespace ParallelMall
             {
                 if (queues[queue].Count != 0)
                 {
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                     while (cases[queue].RefillingPreparation || cases[queue].Refilling) Thread.Sleep(1); //Łapy precz - pan chce nałożyć produkty
                     Client currentClient = queues[queue][0]; //Pierwszy w kolejce
                     while (cases[queue].GetProductCount(currentClient.ProductType) <= 0) Thread.Sleep(1);
                     cases[queue].TakeProduct(currentClient.ProductType);
                     queues[queue].RemoveAt(0);
+                    updateLabel(queue);
                     //lblClientsIndicator.Text = "Clients: " + clientQueue.Count;
                 }
                 else Thread.Sleep(1);
@@ -98,16 +116,22 @@ namespace ParallelMall
 		private void initializeVisualisation()
 		{
 			cases = new List<Case>();
+            queueLabels = new List<Label>();
 			for (int i = 0; i < numberCases; i++)
 			{
 				Case c = new Case(i + 1, numberProductTypes, numberOfProducts);
-				c.Location = new System.Drawing.Point(i *150, 5);
+				c.Location = new Point(i *150, 5);
 				this.Controls.Add(c);
 				cases.Add(c);
 				if (i == numberCases - 1)
 				{
-					this.Size = new Size((i + 1) * 155, 200);
+					this.Size = new Size((i + 1) * 155, 500);
 				}
+                Label l = new Label();
+                l.Location = new Point(i * 150, 175);
+                this.Controls.Add(l);
+                queueLabels.Add(l);
+
 			}
 		}
 
