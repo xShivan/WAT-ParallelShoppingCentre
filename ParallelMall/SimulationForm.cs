@@ -23,10 +23,10 @@ namespace ParallelMall
 		private int numberProductTypes;
 		private int numberOfProducts;
 		private Thread clientsGeneration;
-        private Thread productsConsumption;
         private Thread casesWatching;
 		private List<Case> cases;
-        private List<Client> clientQueue;
+        private List<List<Client>> queues; //Indeksy odpowiadają indeksom półek
+        private List<Thread> productsConsumption;
 
         //Zwraca listę typów produktów, których już nie ma na półce
         private List<int> checkIfCaseIsEmpty(Case c)
@@ -43,17 +43,20 @@ namespace ParallelMall
         {
             while(true)
             {
-                List<int> emptyCases = checkIfCaseIsEmpty(cases[0]);
-                if (emptyCases.Count != 0)
+                for (int caseIndex = 0; caseIndex < numberCases; caseIndex++)
                 {
-                    cases[0].RefillingPreparation = true;
-                    while (cases[0].Taking) Thread.Sleep(1); //Oczekiwanie aż klienci odpuszczą
-                    foreach (int i in emptyCases)
+                    List<int> emptyCases = checkIfCaseIsEmpty(cases[caseIndex]);
+                    if (emptyCases.Count != 0)
                     {
-                        cases[0].RefillProducts(i);
+                        cases[caseIndex].RefillingPreparation = true;
+                        while (cases[caseIndex].Taking) Thread.Sleep(1); //Oczekiwanie aż klienci odpuszczą
+                        foreach (int i in emptyCases)
+                        {
+                            cases[caseIndex].RefillProducts(i);
+                        }
                     }
+                    else Thread.Sleep(1000);
                 }
-                else Thread.Sleep(1000);
             }
         }
 
@@ -63,29 +66,30 @@ namespace ParallelMall
 			Random rand = new Random();
 			while (true)
 			{
-				int time = rand.Next(500, 1300); //Czas oczekiwania na dołączenie kolejnego klienta
+				int time = rand.Next(500 / numberCases * 3, 1300 / numberCases * 3); //Czas oczekiwania na dołączenie kolejnego klienta
 				Thread.Sleep(time);
-				int queue = rand.Next(0, numberCases - 1); //Numer kolejki do dołączenia się
+				int queue = rand.Next(0, numberCases); //Numer kolejki do dołączenia się
                 int productType = rand.Next(0, numberProductTypes);
                 Client c = new Client(productType);
-                clientQueue.Add(c);
-                lblClientsIndicator.Text = "Clients: " + clientQueue.Count;
+                queues[queue].Add(c);
+                lblClientsIndicator.Text = "Clients: " + queues[0].Count.ToString() + " " + queues[1].Count.ToString() + "" +queues[2].Count.ToString();
 			}
 		}
 
-        private void consumeProducts()
+        private void consumeProducts(object queueObject)
         {
+            int queue = (int)queueObject;
             while (true)
             {
-                if (clientQueue.Count != 0)
+                if (queues[queue].Count != 0)
                 {
                     Thread.Sleep(500);
-                    while (cases[0].RefillingPreparation || cases[0].Refilling) Thread.Sleep(1); //Łapy precz - pan chce nałożyć produkty
-                    Client currentClient = clientQueue[0];
-                    while (cases[0].GetProductCount(currentClient.ProductType) <= 0) Thread.Sleep(1);
-                    cases[0].TakeProduct(currentClient.ProductType);
-                    clientQueue.RemoveAt(0);
-                    lblClientsIndicator.Text = "Clients: " + clientQueue.Count;
+                    while (cases[queue].RefillingPreparation || cases[queue].Refilling) Thread.Sleep(1); //Łapy precz - pan chce nałożyć produkty
+                    Client currentClient = queues[queue][0]; //Pierwszy w kolejce
+                    while (cases[queue].GetProductCount(currentClient.ProductType) <= 0) Thread.Sleep(1);
+                    cases[queue].TakeProduct(currentClient.ProductType);
+                    queues[queue].RemoveAt(0);
+                    //lblClientsIndicator.Text = "Clients: " + clientQueue.Count;
                 }
                 else Thread.Sleep(1);
             }
@@ -109,15 +113,26 @@ namespace ParallelMall
 
         public void initializeSimulation()
         {
-            clientQueue = new List<Client>();
+            queues = new List<List<Client>>();
+            for (int i = 0; i < numberCases; i++)
+            {
+                List<Client> queue = new List<Client>();
+                queues.Add(queue);
+            }
+
             casesWatching = new Thread(new ThreadStart(watchCases));
             casesWatching.Start();
 
             clientsGeneration = new Thread(new ThreadStart(generateClients));
             clientsGeneration.Start();
 
-            productsConsumption = new Thread(new ThreadStart(consumeProducts));
-            productsConsumption.Start();
+            productsConsumption = new List<Thread>();
+            for (int i = 0; i < numberCases; i++)
+            {
+                Thread t = new Thread(new ParameterizedThreadStart(consumeProducts));
+                t.Start(i);
+                productsConsumption.Add(t);
+            }
         }
 		
 		public SimulationForm(int casesCount, int typesCount, int productCount)
